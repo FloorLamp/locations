@@ -12,7 +12,7 @@ var Checkin = require('../models/Checkin');
 var Venue = require('../models/Venue');
 
 var db = mongoose.connection;
-var config = require('../config');
+var config = require('../../package').config;
 mongoose.connect(config.db.url);
 
 const USER_URL = 'https://api.foursquare.com/v2/users/self';

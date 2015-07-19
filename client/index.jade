@@ -1,0 +1,12 @@
+doctype html
+html
+  head
+    title= Locations
+    unless debug
+      link(rel='stylesheet', href='app.css')
+  body
+    if debug
+      img(src='img/fry.png')
+      em DEBUG MODE
+    #app
+    script(src='app.js')

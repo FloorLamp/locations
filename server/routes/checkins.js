@@ -5,9 +5,9 @@ var User = require('../models/User');
 var Checkin = require('../models/Checkin');
 var Venue = require('../models/Venue');
 
-router.get('/:id', function(req, res, next) {
+router.get('/', function(req, res, next) {
   Checkin
-    .find({'user': req.params.id})
+    .find()
     .populate('venue', 'name location categories')
     .select({created_at: 1, venue: 1})
     .sort({created_at: -1})
