@@ -1,0 +1,63 @@
+.calendar {
+  border: 1px solid gray;
+
+  .week {
+    display: flex;
+
+    .day {
+      position: relative;
+      display: inline-block;
+      flex: 1;
+      border: 1px solid gray;
+      padding-top: 30px;
+      height: 100px;
+      overflow: hidden;
+
+      &.today {
+        background: paleturquoise;
+      }
+
+      &.month-stripe {
+        background: darken(white, 5%);
+      }
+
+      &:hover {
+        border-color: red;
+        overflow: visible;
+      }
+
+      .date {
+        position: absolute;
+        font-weight: bold;
+        right: 8px;
+        top: 8px;
+      }
+
+      ul {
+        padding: 0 8px 8px;
+
+        li {
+          position: relative;
+          margin-bottom: 2px;
+          font-size: .8em;
+          display: flex;
+          align-items: center;
+
+          img {
+            width: 16px;
+            height: 16px;
+            margin-right: 4px;
+          }
+          .venue {
+            width: calc(100% - 40px);
+            overflow-x: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .time {
+          }
+        }
+      }
+    }
+  }
+}

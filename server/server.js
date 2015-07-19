@@ -2,6 +2,7 @@
 
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var cors = require('cors')
 var express = require('express');
 var logger = require('winston');
 var mongoose = require('mongoose');
@@ -13,6 +14,7 @@ var config = require('../package').config;
 var app = express();
 var db = mongoose.connection;
 
+app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

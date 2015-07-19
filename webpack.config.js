@@ -14,6 +14,7 @@ var entry = {
 };
 
 var jsxLoader = ['babel'];
+var cssLoader;
 var scssLoader;
 var fileLoader = 'file-loader?name=[path][name].[ext]';
 var jadeLoader = [
@@ -25,6 +26,17 @@ var jadeLoader = [
 ].join('!');
 
 var plugins = [
+  new webpack.optimize.OccurenceOrderPlugin(true),
+  new webpack.ProvidePlugin({
+    '_': 'lodash',
+    moment: 'moment',
+    request: 'browser-request',
+    classNames: 'classnames',
+    React: 'react'
+  }),
+  new webpack.DefinePlugin({
+    API_SERVER: JSON.stringify('http://localhost:' + config.express.port)
+  }),
   new webpack.NoErrorsPlugin()
 ];
 
@@ -33,10 +45,12 @@ if (DEBUG) {
   entry.app.push('webpack/hot/only-dev-server');
 
   jsxLoader.unshift('react-hot');
+  cssLoader = 'style!css!postcss';
   scssLoader = 'style!css!sass';
 
   plugins.unshift(new webpack.HotModuleReplacementPlugin());
 } else {
+  cssLoader = ExtractTextPlugin.extract('css!postcss');
   scssLoader = ExtractTextPlugin.extract('css!sass');
 
   plugins.unshift(new ExtractTextPlugin('app.css', {allChunks: true}));
@@ -55,6 +69,9 @@ module.exports = {
         loaders: jsxLoader,
         include: path.resolve(__dirname, 'client')
       }, {
+        test: /\.css$/,
+        loader: cssLoader
+      }, {
         test: /\.scss$/,
         loader: scssLoader
       }, {
@@ -66,6 +83,9 @@ module.exports = {
       }
     ]
   },
+  postcss: [
+    require('autoprefixer-core')
+  ],
   plugins: plugins,
   resolve: {
     extensions: ['', '.js', '.json', '.jsx']
@@ -73,12 +93,10 @@ module.exports = {
   output: {
     path: BUILD_PATH,
     publicPath: '/',
-    // publicPath: 'http://localhost:' + config.webpackPort + '/assets/',
     filename: '[name].js'
   },
   devServer: {
     contentBase: BUILD_PATH,
-    // publicPath: '/assets/',
     noInfo: false,
     hot: true,
     inline: true,

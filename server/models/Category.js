@@ -4,18 +4,9 @@ var moment = require('moment');
 var schema = new mongoose.Schema({
   _id: String,
   name: String,
-  location: {
-    lat: Number,
-    lng: Number,
-    address: String,
-    city: String,
-    state: String,
-    postal_code: String,
-    country: String,
-  },
-  categories: [
-    {type: mongoose.Schema.Types.ObjectId, ref: 'Category'}
-  ],
+  plural_name: String,
+  short_name: String,
+  icon: String,
   created_at: Number,
   updated_at: Number,
 });
@@ -32,6 +23,6 @@ schema.pre('save', function(next) {
   next();
 });
 
-var Venue = mongoose.model('Venue', schema);
+var Category = mongoose.model('Category', schema);
 
-module.exports = Venue;
+module.exports = Category;

@@ -7,8 +7,9 @@ var moment = require('moment');
 var request = require('request');
 var mongoose = require('mongoose');
 
-var User = require('../models/User');
+var Category = require('../models/Category');
 var Checkin = require('../models/Checkin');
+var User = require('../models/User');
 var Venue = require('../models/Venue');
 
 var db = mongoose.connection;
@@ -146,40 +147,60 @@ function insert_checkins(user, items, cb) {
         return;
       }
 
+      // create venue
       Venue.findOne({id: item.venue.id}, function(err, venue) {
         if (err) logger.error('findOne Venue:', err);
+        if (venue) return;
 
-        if (!venue) {
-          var new_venue = Venue({
-            _id: item.venue.id,
-            name: item.venue.name,
-            location: {
-              lat: item.venue.location.lat,
-              lng: item.venue.location.lng,
-              address: item.venue.location.address,
-              city: item.venue.location.city,
-              state: item.venue.location.state,
-              postal_code: item.venue.location.postalCode,
-              country: item.venue.location.country,
-            },
-            categories: _.map(item.venue.categories, function(category) {
-              return {
-                id: category.id,
-                name: category.name,
-                primary: category.primary
+        var new_venue = Venue({
+          _id: item.venue.id,
+          name: item.venue.name,
+          location: {
+            lat: item.venue.location.lat,
+            lng: item.venue.location.lng,
+            address: item.venue.location.address,
+            city: item.venue.location.city,
+            state: item.venue.location.state,
+            postal_code: item.venue.location.postalCode,
+            country: item.venue.location.country,
+          },
+          categories: _.pluck(item.venue.categories, 'id')
+        });
+        new_venue.save(function(err) {
+          if (err && err.code !== 11000) { // skip dupes
+            logger.error('save venue:', err);
+          } else {
+            logger.info('create venue', item.venue.id, item.venue.name);
+          }
+        });
+
+        // create categories
+        async.each(item.venue.categories, function(category, cb) {
+
+          Category.findOne({id: category.id}, function(err, found_category) {
+            if (err) logger.error('findOne Category:', err);
+            if (found_category) return cb();
+
+            var new_category = Category({
+              _id: category.id,
+              name: category.name,
+              plural_name: category.pluralName,
+              short_name: category.shortName,
+              icon: category.icon.prefix + 'bg_32' + category.icon.suffix
+            });
+            new_category.save(function(err) {
+              if (err && err.code !== 11000) { // skip dupes
+                logger.error('save category:', err);
+              } else {
+                logger.info('create category', category.name);
               }
-            }),
+              cb();
+            });
           });
-          new_venue.save(function(err) {
-            if (err && err.code !== 11000) { // skip dupes
-              logger.error('save venue:', err);
-            } else {
-              logger.info('create venue', item.venue.id, item.venue.name);
-            }
-          });
-        }
 
-        create_checkin(user, item, cb);
+        }, function() {
+          create_checkin(user, item, cb);
+        });
       });
     });
   }, function(err) {
