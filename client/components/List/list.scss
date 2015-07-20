@@ -1,0 +1,45 @@
+.list {
+
+  > li {
+    margin-bottom: 8px;
+    background: #fafafa;
+
+    &.today {
+      .date {
+        background: darken(paleturquoise, 25%);
+      }
+    }
+
+    .date {
+      padding: 4px 8px;
+      background: paleturquoise;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    ul {
+      padding: 8px;
+
+      li {
+        position: relative;
+        margin-bottom: 2px;
+        display: flex;
+        align-items: center;
+
+        img {
+          width: 32px;
+          height: 32px;
+          margin-right: 8px;
+        }
+        .venue {
+          width: calc(100% - 40px);
+          overflow-x: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .time {
+        }
+      }
+    }
+  }
+}

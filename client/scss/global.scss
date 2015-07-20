@@ -1,0 +1,45 @@
+body {
+  background: #fdfdfd;
+}
+
+header {
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  line-height: 40px;
+  background: lightgreen;
+  padding: 4px;
+
+  h1 {
+    font-weight: normal;
+    margin: 0;
+  }
+}
+
+main {
+  padding-top: 48px;
+  display: flex;
+
+  > aside {
+    padding: 8px;
+
+    &.side-1 {
+      flex: 1;
+    }
+    &.side-2 {
+      flex: 2;
+      background: lightgray;
+    }
+  }
+}
+
+nav {
+  height: 40px;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+

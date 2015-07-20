@@ -1,6 +1,6 @@
-import './calendar.scss';
+import './list.scss';
 
-export default class Calendar extends React.Component {
+export default class List extends React.Component {
 
   constructor(...args) {
     super(...args);
@@ -15,11 +15,12 @@ export default class Calendar extends React.Component {
   }
 
   render() {
-    let calendar = [];
-    let week = [];
+    let list = [];
     let today = moment().startOf('day');
 
     this.props.calendar_range.by('days', (day) => {
+      if (!this.props.checkins_by_day[day]) return;
+
       let checkins = _.map(this.props.checkins_by_day[day], (checkin) => {
         return (
           <li key={checkin._id}>
@@ -32,31 +33,22 @@ export default class Calendar extends React.Component {
         );
       });
 
-      week.push(
-        <div key={day.weekday()} className={classNames('day', {today: day.isSame(today), 'month-stripe': day.month() % 2})}>
-          <div className="date">{day.date() === 1 && day.format('MMM ')}{day.format('D')}</div>
+      list.unshift(
+        <li key={day.unix()} className={classNames({today: day.isSame(today)})}>
+          <div className="date">{day.format('dddd, MMM D')}</div>
           <div className="details">
             <ul>
               {checkins}
             </ul>
           </div>
-        </div>
+        </li>
       );
-
-      if (day.weekday() === 6) {
-        calendar.push(
-          <div key={day.unix()} className="week">
-            {week}
-          </div>
-        );
-        week = [];
-      }
     });
 
     return (
-      <div className="calendar">
-        {calendar}
-      </div>
+      <ul className="list">
+        {list}
+      </ul>
     );
   }
 }
