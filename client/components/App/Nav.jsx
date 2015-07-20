@@ -15,7 +15,8 @@ export default class Nav extends React.Component {
   render() {
     return (
       <nav>
-        <input type="button" className="view-toggle" value={this.props.view == 'calendar' ? 'List View' : 'Calendar View'} onClick={this.props.handleChangeView} />
+        <input type="text" className="txt-search" value={this.props.search} onChange={this.props.handleUpdateSearch} />
+        <input type="button" className="btn-view" value={this.props.view == 'calendar' ? 'List' : 'Calendar'} onClick={this.props.handleChangeView} />
       </nav>
     );
   }

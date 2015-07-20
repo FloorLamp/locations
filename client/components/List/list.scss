@@ -3,6 +3,7 @@
   > li {
     margin-bottom: 8px;
     background: #fafafa;
+    border-radius: 3px;
 
     &.today {
       .date {
@@ -15,6 +16,7 @@
       background: paleturquoise;
       font-weight: bold;
       text-align: right;
+      border-radius: 3px;
     }
 
     ul {

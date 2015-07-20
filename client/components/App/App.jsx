@@ -1,5 +1,4 @@
 import Header from './Header';
-import Nav from './Nav';
 
 import Calendar from '../Calendar/Calendar';
 import List from '../List/List';
@@ -10,12 +9,16 @@ export default class App extends React.Component {
   constructor(...args) {
     super(...args);
     this.state = {
-      view: 'list',
+      current_view: 'list',
+      default_view: 'list',
+      search: '',
+
       calendar_range: moment.range(moment().subtract('30', 'days').startOf('week'), moment().endOf('week')),
       checkins: [],
       checkins_by_day: {}
     }
     this.handleChangeView = this.handleChangeView.bind(this);
+    this.handleUpdateSearch = this.handleUpdateSearch.bind(this);
   }
 
   componentDidMount() {
@@ -35,23 +38,37 @@ export default class App extends React.Component {
   }
 
   handleChangeView() {
+    let default_view = this.state.default_view == 'calendar' ? 'list' : 'calendar';
     this.setState({
-      view: this.state.view == 'calendar' ? 'list' : 'calendar'
+      default_view,
+      current_view: this.state.search ? 'list' : default_view
+    });
+  }
+
+  handleUpdateSearch(e) {
+    let value = e.target.value;
+    this.setState({
+      search: value,
+      current_view: value ? 'list' : this.state.default_view
     });
   }
 
   render() {
     return (
       <div>
-        <Header />
-        <main>
+        <Header
+          search={this.state.search}
+          view={this.state.default_view}
+          handleUpdateSearch={this.handleUpdateSearch}
+          handleChangeView={this.handleChangeView} />
+        <main className={this.state.current_view}>
           <aside className="side-1">
-            <Nav view={this.state.view} handleChangeView={this.handleChangeView} />
-            {this.state.view == 'calendar' ?
+            {this.state.current_view == 'calendar' ?
             <Calendar
               calendar_range={this.state.calendar_range}
               checkins_by_day={this.state.checkins_by_day} /> :
             <List
+              search={this.state.search}
               calendar_range={this.state.calendar_range}
               checkins_by_day={this.state.checkins_by_day} />}
           </aside>
