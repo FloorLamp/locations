@@ -32,8 +32,17 @@ export default class Calendar extends React.Component {
         );
       });
 
+      let dayClasses = classNames('day', {
+        today: day.isSame(today),
+        'month-stripe': day.month() % 2,
+        selected: day.isSame(this.props.selected_day)
+      });
+
       week.push(
-        <div key={day.weekday()} className={classNames('day', {today: day.isSame(today), 'month-stripe': day.month() % 2})}>
+        <div
+          key={day.weekday()}
+          className={dayClasses}
+          onClick={this.props.handleSelectDay.bind(null, day)}>
           <div className="date">{day.date() === 1 && day.format('MMM ')}{day.format('D')}</div>
           <div className="details">
             <ul>

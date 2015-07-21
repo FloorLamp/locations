@@ -45,9 +45,12 @@ main {
   display: flex;
 
   > aside {
-    padding: 8px;
+    flex: 1 100%;
+    display: flex;
+    overflow: hidden;
 
     &.side-1 {
+      padding: 8px;
     }
     &.side-2 {
       background: lightgray;

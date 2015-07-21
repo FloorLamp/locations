@@ -43,8 +43,8 @@ export default class List extends React.Component {
       });
 
       list.unshift(
-        <li key={day.unix()} className={classNames({today: day.isSame(today)})}>
-          <div className="date">{day.format('dddd, MMMM D, YYYY')}</div>
+        <li key={day.unix()} className={classNames({today: day.isSame(today), selected: day.isSame(this.props.selected_day)})}>
+          <div className="date" onClick={this.props.handleSelectDay.bind(null, day)}>{day.format('dddd, MMMM D, YYYY')}</div>
           <div className="details">
             <ul>
               {checkins}

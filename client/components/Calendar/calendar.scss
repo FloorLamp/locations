@@ -14,7 +14,14 @@
       overflow: hidden;
 
       &.today {
-        background: paleturquoise;
+        background: darken(white, 8%);
+        .date {
+          color: purple;
+        }
+      }
+
+      &.selected {
+        background: lightpink;
       }
 
       &.month-stripe {

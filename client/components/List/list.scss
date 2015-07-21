@@ -1,13 +1,17 @@
-.list {
+ul.list {
+  flex: 1;
 
   > li {
     margin-bottom: 8px;
     background: #fafafa;
     border-radius: 3px;
 
-    &.today {
+    &.selected {
+      background: #eee;
+
       .date {
-        background: darken(paleturquoise, 25%);
+        background: lightpink;
+        cursor: default;
       }
     }
 
@@ -17,6 +21,7 @@
       font-weight: bold;
       text-align: right;
       border-radius: 3px;
+      cursor: pointer;
     }
 
     ul {
