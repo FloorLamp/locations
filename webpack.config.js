@@ -32,7 +32,8 @@ var plugins = [
     moment: 'moment',
     request: 'browser-request',
     classNames: 'classnames',
-    React: 'react'
+    React: 'react',
+    Router: 'react-router'
   }),
   new webpack.DefinePlugin({
     API_SERVER: JSON.stringify('http://localhost:' + config.express.port)
@@ -96,6 +97,7 @@ module.exports = {
     filename: '[name].js'
   },
   devServer: {
+    historyApiFallback: true,
     contentBase: BUILD_PATH,
     noInfo: false,
     hot: true,

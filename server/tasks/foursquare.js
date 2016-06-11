@@ -1,19 +1,19 @@
 'use strict';
 
-var _ = require('lodash');
-var async = require('async');
-var logger = require('winston');
-var moment = require('moment');
-var request = require('request');
-var mongoose = require('mongoose');
+let _ = require('lodash');
+let async = require('async');
+let logger = require('winston');
+let moment = require('moment');
+let request = require('request');
+let mongoose = require('mongoose');
 
-var Category = require('../models/Category');
-var Checkin = require('../models/Checkin');
-var User = require('../models/User');
-var Venue = require('../models/Venue');
+let Category = require('../models/Category');
+let Checkin = require('../models/Checkin');
+let User = require('../models/User');
+let Venue = require('../models/Venue');
 
-var db = mongoose.connection;
-var config = require('../../package').config;
+let db = mongoose.connection;
+let config = require('../../package').config;
 mongoose.connect(config.db.url);
 
 const USER_URL = 'https://api.foursquare.com/v2/users/self';
@@ -72,63 +72,83 @@ function fetch_user(token, cb) {
 }
 
 function fetch_checkins(user, cb) {
-  var keep_fetching = true;
-  var beforeTimestamp;
-  var inserted_count = 0;
-  var insert_total = 0;
+  let keep_fetching = true;
+  let finished_fetching = false;
+  let afterTimestamp;
+  let beforeTimestamp;
+  let inserted_count = 0;
+  let insert_total = 0;
 
-  async.doWhilst(function(cb) {
-    // when fetching is done, wait for inserts to finish
-    if (beforeTimestamp === -1) {
-      if (inserted_count == insert_total) {
-        keep_fetching = false;
-      }
-      return cb();
+  Checkin.findOne({'user': user._id}).sort({created_at: -1}).select('created_at').exec(function(err, last_checkin) {
+    if (err) logger.error(err);
+    if (last_checkin) {
+      afterTimestamp = last_checkin.created_at - 60;
     }
 
-    var qs = {
-      v: '20150717',
-      oauth_token: user.foursquare.access_token,
-      limit: 250,
-      beforeTimestamp
-    };
-    logger.info(`fetching checkins for ${user.name.full} with qs:`, qs);
+    async.doWhilst(function(cb) {
+      // when fetching is done, wait for inserts to finish
+      if (finished_fetching) {
+        if (inserted_count == insert_total) {
+          keep_fetching = false;
+        }
+        return cb();
+      }
 
-    request.get({
-      url: CHECKIN_URL,
-      qs,
-      json: true,
-    }, function(err, res, body) {
-      if (err) {
-        logger.error(err);
-        return cb(err);
-      }
-      if (res.statusCode !== 200) {
-        logger.error(res.statusCode, body);
-        return cb(body);
-      }
-      if (body.meta.code !== 200) {
-        logger.warn(body.meta.code, body)
-        return cb(body);
-      }
-      if (body.response.checkins.items && body.response.checkins.items.length) {
-        if (beforeTimestamp === undefined) logger.info('total checkins:', body.response.checkins.count);
-        insert_total++;
-        beforeTimestamp = body.response.checkins.items.slice(-1)[0].createdAt;
-        insert_checkins(user, body.response.checkins.items, function(err) {
-          inserted_count++;
-          cb(err);
-        });
-      } else {
-        beforeTimestamp = -1;
-        cb();
-      }
-    });
-  }, function() { // test
-    return keep_fetching;
-  }, function(err) {
-    cb(err);
-  })
+      let qs = {
+        v: '20150717',
+        oauth_token: user.foursquare.access_token,
+        limit: 250,
+        beforeTimestamp,
+        afterTimestamp
+      };
+      logger.info(`fetching checkins for ${user.name.full} with qs:`, qs);
+
+      request.get({
+        url: CHECKIN_URL,
+        qs,
+        json: true,
+      }, function(err, res, body) {
+        if (err) {
+          logger.error(err);
+          return cb(err);
+        }
+        if (res.statusCode !== 200) {
+          logger.error(res.statusCode, body);
+          return cb(body);
+        }
+        if (body.meta.code !== 200) {
+          logger.warn(body.meta.code, body)
+          return cb(body);
+        }
+        if (body.response.checkins.items && body.response.checkins.items.length) {
+          if (beforeTimestamp === undefined && afterTimestamp === undefined) logger.info('total checkins:', body.response.checkins.count);
+          insert_total++;
+          if (afterTimestamp === undefined) {
+            beforeTimestamp = body.response.checkins.items.slice(-1)[0].createdAt;
+          } else {
+            // if more than 250 keep going
+            if (body.response.checkins.items.length == 250) {
+              afterTimestamp = body.response.checkins.items[0].createdAt;
+            } else {
+              finished_fetching = true;
+            }
+          }
+          insert_checkins(user, body.response.checkins.items, function(err) {
+            inserted_count++;
+            cb(err);
+          });
+        } else {
+          finished_fetching = true;
+          cb();
+        }
+      });
+    }, function() { // test
+      return keep_fetching;
+    }, function(err) {
+      cb(err);
+    })
+  });
+
 }
 
 function insert_checkins(user, items, cb) {
@@ -152,7 +172,7 @@ function insert_checkins(user, items, cb) {
         if (err) logger.error('findOne Venue:', err);
         if (venue) return;
 
-        var new_venue = Venue({
+        let new_venue = Venue({
           _id: item.venue.id,
           name: item.venue.name,
           location: {
@@ -181,7 +201,7 @@ function insert_checkins(user, items, cb) {
             if (err) logger.error('findOne Category:', err);
             if (found_category) return cb();
 
-            var new_category = Category({
+            let new_category = Category({
               _id: category.id,
               name: category.name,
               plural_name: category.pluralName,
@@ -211,7 +231,7 @@ function insert_checkins(user, items, cb) {
 }
 
 function create_checkin(user, item, cb) {
-  var new_checkin = Checkin({
+  let new_checkin = Checkin({
     user: user._id,
     created_at: item.createdAt,
     foursquare: {

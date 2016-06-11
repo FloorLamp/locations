@@ -1,11 +1,9 @@
-.map {
+#map {
   position: fixed;
   top: 40px;
   height: calc(100% - 40px);
+  width: 66.66%;
 
-  .list & {
-    width: 66.66%;
-  }
   .calendar & {
     width: 33.33%;
   }

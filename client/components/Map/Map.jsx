@@ -18,16 +18,16 @@ export default class Map extends React.Component {
       mapTypeId: google.maps.MapTypeId.ROADMAP
     }
     this.setState({
-      map: new google.maps.Map(this.refs.map, mapOptions)
+      map: new google.maps.Map(React.findDOMNode(this.refs.map), mapOptions)
     });
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.current_view !== this.props.current_view) {
+    if (nextProps.view !== this.props.view) {
       google.maps.event.trigger(this.state.map, 'resize');
     }
 
-    if (!nextProps.mapped_checkins || !nextProps.mapped_checkins.length || _.isEqual(nextProps.mapped_checkins, this.props.mapped_checkins)) return;
+    if (!nextProps.map_venues || !nextProps.map_venues.length || _.isEqual(nextProps.map_venues, this.props.map_venues)) return;
 
     if (this.state.markers.length) {
       _.each(this.state.markers, (marker) => {
@@ -35,15 +35,18 @@ export default class Map extends React.Component {
       });
     }
 
-    let markers = _.map(nextProps.mapped_checkins, (checkin) => {
+    let venues = _.uniq(nextProps.map_venues, '_id');
+    console.log(venues);
+
+    let markers = _.map(venues, (venue) => {
       return new google.maps.Marker({
         map: this.state.map,
         position: {
-          lat: checkin.venue.location.lat,
-          lng: checkin.venue.location.lng,
+          lat: venue.location.lat,
+          lng: venue.location.lng,
         },
-        title: checkin.venue.name,
-        icon: checkin.venue.categories[0].icon
+        title: venue.name,
+        icon: venue.categories[0].icon
       })
     });
     this.setState({
@@ -52,15 +55,20 @@ export default class Map extends React.Component {
 
     let bounds = new google.maps.LatLngBounds(
       new google.maps.LatLng(
-        _.min(nextProps.mapped_checkins, (checkin) => checkin.venue.location.lat).venue.location.lat,
-        _.min(nextProps.mapped_checkins, (checkin) => checkin.venue.location.lng).venue.location.lng
+        _.min(venues, (venue) => venue.location.lat).location.lat,
+        _.min(venues, (venue) => venue.location.lng).location.lng
       ),
       new google.maps.LatLng(
-        _.max(nextProps.mapped_checkins, (checkin) => checkin.venue.location.lat).venue.location.lat,
-        _.max(nextProps.mapped_checkins, (checkin) => checkin.venue.location.lng).venue.location.lng
+        _.max(venues, (venue) => venue.location.lat).location.lat,
+        _.max(venues, (venue) => venue.location.lng).location.lng
       )
     );
     this.state.map.fitBounds(bounds);
+    console.log(markers, bounds);
+
+    if (venues.length == 1) {
+      this.state.map.setZoom(18);
+    }
   }
 
   componentWillUnmount() {
@@ -68,7 +76,7 @@ export default class Map extends React.Component {
 
   render() {
     return (
-      <div className="map">
+      <div id="map">
         <div ref="map" />
       </div>
     );

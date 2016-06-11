@@ -1,6 +1,9 @@
 import './list.scss';
 
-export default class List extends React.Component {
+class List extends React.Component {
+  static willTransitionTo(transition, params, query) {
+    console.log('willTransitionTo List');
+  }
 
   constructor(...args) {
     super(...args);
@@ -20,9 +23,10 @@ export default class List extends React.Component {
     let search_re = new RegExp(this.props.search, 'i');
 
     this.props.calendar_range.by('days', (day) => {
-      if (!this.props.checkins_by_day[day]) return;
+      let timestamp = day.unix();
+      if (!this.props.checkins_by_day[timestamp]) return;
 
-      let day_checkins = this.props.checkins_by_day[day];
+      let day_checkins = this.props.checkins_by_day[timestamp];
       if (this.props.search) {
         day_checkins = _.filter(day_checkins, (checkin) => {
           return checkin.venue.name.match(search_re) || checkin.venue.categories[0].name.match(search_re);
@@ -34,7 +38,7 @@ export default class List extends React.Component {
         return (
           <li key={checkin._id}>
             <img className="icon" src={checkin.venue.categories[0].icon} />
-            <div className="venue">
+            <div className="venue" onClick={this.context.router.transitionTo.bind(null, '/venue/' + checkin.venue._id)}>
               {checkin.venue.name}
             </div>
             <div className="time">{moment.unix(checkin.created_at).format('HH:mm')}</div>
@@ -43,8 +47,8 @@ export default class List extends React.Component {
       });
 
       list.unshift(
-        <li key={day.unix()} className={classNames({today: day.isSame(today), selected: day.isSame(this.props.selected_day)})}>
-          <div className="date" onClick={this.props.handleSelectDay.bind(null, day)}>{day.format('dddd, MMMM D, YYYY')}</div>
+        <li key={timestamp} className={classNames({today: day.isSame(today), selected: timestamp == this.props.params.day})}>
+          <div className="date" onClick={this.context.router.transitionTo.bind(null, '/list/' + timestamp)}>{day.format('dddd, MMMM D, YYYY')}</div>
           <div className="details">
             <ul>
               {checkins}
@@ -55,9 +59,15 @@ export default class List extends React.Component {
     });
 
     return (
-      <ul className="list">
+      <ul id="list">
         {list}
       </ul>
     );
   }
 }
+
+List.contextTypes = {
+  router: React.PropTypes.func.isRequired
+}
+
+export default List;

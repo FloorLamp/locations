@@ -1,4 +1,4 @@
-ul.list {
+#list {
   flex: 1;
 
   > li {
@@ -43,6 +43,7 @@ ul.list {
           overflow-x: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+          cursor: pointer;
         }
         .time {
         }

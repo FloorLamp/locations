@@ -50,20 +50,23 @@ main {
     overflow: hidden;
 
     &.side-1 {
+      flex: 1;
       padding: 8px;
     }
     &.side-2 {
+      flex: 2;
       background: lightgray;
     }
   }
-  &.list > aside {
-    &.side-1 {
-      flex: 1;
-    }
-    &.side-2 {
-      flex: 2;
-    }
-  }
+  // &.list > aside,
+  // &.venue > aside {
+  //   &.side-1 {
+  //     flex: 1;
+  //   }
+  //   &.side-2 {
+  //     flex: 2;
+  //   }
+  // }
   &.calendar > aside {
     &.side-1 {
       flex: 2;

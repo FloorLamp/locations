@@ -1,0 +1,10 @@
+.venue-details {
+  flex: 1;
+
+  .checkins {
+
+    > li {
+      text-align: right;
+    }
+  }
+}

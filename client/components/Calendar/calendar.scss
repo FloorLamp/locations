@@ -1,5 +1,11 @@
-.calendar {
+#calendar-wrapper {
+  position: relative;
+  width: 100%;
+}
+#calendar {
   border: 1px solid gray;
+  flex: 1;
+  margin-top: 24px;
 
   .week {
     display: flex;
@@ -67,4 +73,17 @@
       }
     }
   }
+}
+
+#month-bar {
+  position: fixed;
+  z-index: 10;
+  width: calc(66.666% - 8px);
+  height: 40px;
+  top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  border-bottom: 1px solid gray;
 }
